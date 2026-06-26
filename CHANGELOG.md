@@ -17,11 +17,15 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - Widget test coverage for the new app shell.
 - Source selection, output placement, and trim validation controls for the conversion workflow.
 - Browse actions for manually selecting `ffmpeg` and `ffprobe` executables.
+- Top-level source scanning, media probing, output path generation, ffmpeg command building, and sequential conversion execution services.
+- Conversion progress and per-file results UI for the initial runnable pipeline.
+- Service-level test coverage for source resolution, probe classification, output path generation, and ffmpeg argument building.
 
 ### Changed
 
 - Replaced the default Flutter counter app with a Resolve-focused desktop shell.
 - Updated dependencies to support file picking, path handling, and shared preferences.
+- Switched Linux file and directory picking to `file_selector`.
 
 ### Fixed
 

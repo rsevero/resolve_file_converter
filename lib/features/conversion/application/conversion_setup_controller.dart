@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../../../models/conversion_enums.dart';
+import '../../../models/conversion_request.dart';
 import '../../../services/trim_parser_service.dart';
 
 class ConversionSetupController extends ChangeNotifier {
@@ -71,6 +72,28 @@ class ConversionSetupController extends ChangeNotifier {
     _validateTrimRange();
     notifyListeners();
     return hasValidTrimRange && hasSourceSelection;
+  }
+
+  ConversionRequest? buildRequest({
+    required String ffmpegPath,
+    required String ffprobePath,
+  }) {
+    if (!validateBeforeConversion() || !hasSourceSelection) {
+      return null;
+    }
+
+    final startResult = _trimParserService.parse(_startTimeText);
+    final endResult = _trimParserService.parse(_endTimeText);
+
+    return ConversionRequest(
+      sourcePath: _selectedSourcePath!,
+      sourceType: _sourceType,
+      outputMode: _outputMode,
+      ffmpegPath: ffmpegPath,
+      ffprobePath: ffprobePath,
+      startTime: startResult.duration,
+      endTime: endResult.duration,
+    );
   }
 
   void _validateTrimRange() {

@@ -6,9 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
 
 import '../../../models/conversion_enums.dart';
+import '../../../models/conversion_result.dart';
 import '../../../models/tool_detection_result.dart';
 import '../../../services/app_settings_service.dart';
 import '../../../services/tool_detection_service.dart';
+import '../application/conversion_run_controller.dart';
 import '../application/conversion_setup_controller.dart';
 import '../../settings/application/tool_paths_controller.dart';
 
@@ -22,6 +24,7 @@ class ConversionShellPage extends StatefulWidget {
 class _ConversionShellPageState extends State<ConversionShellPage> {
   late final ToolPathsController _toolPathsController;
   late final ConversionSetupController _conversionSetupController;
+  late final ConversionRunController _conversionRunController;
   late final TextEditingController _ffmpegTextController;
   late final TextEditingController _ffprobeTextController;
   late final TextEditingController _startTimeTextController;
@@ -40,6 +43,7 @@ class _ConversionShellPageState extends State<ConversionShellPage> {
     )..addListener(_syncTextControllers);
     _conversionSetupController = ConversionSetupController()
       ..addListener(_syncTextControllers);
+    _conversionRunController = ConversionRunController();
 
     _toolPathsController.load();
   }
@@ -52,6 +56,7 @@ class _ConversionShellPageState extends State<ConversionShellPage> {
     _conversionSetupController
       ..removeListener(_syncTextControllers)
       ..dispose();
+    _conversionRunController.dispose();
     _ffmpegTextController.dispose();
     _ffprobeTextController.dispose();
     _startTimeTextController.dispose();
@@ -67,6 +72,7 @@ class _ConversionShellPageState extends State<ConversionShellPage> {
           animation: Listenable.merge([
             _toolPathsController,
             _conversionSetupController,
+            _conversionRunController,
           ]),
           builder: (context, _) {
             return SingleChildScrollView(
@@ -114,20 +120,14 @@ class _ConversionShellPageState extends State<ConversionShellPage> {
                               endTimeTextController: _endTimeTextController,
                             ),
                           ),
-                          const SizedBox(
+                          SizedBox(
                             width: 1064,
-                            child: _WorkflowCard(
-                              title: 'Implementation status',
-                              description:
-                                  'Steps 5 to 8 now cover tool-path overrides with '
-                                  'browse actions, source selection, output mode '
-                                  'preview, and trim validation.',
-                              bullets: [
-                                'Separate ffmpeg and ffprobe browse actions',
-                                'Single file or top-level directory selection',
-                                'Output placement preview before conversion',
-                                'Trim format and range validation',
-                              ],
+                            child: _ExecutionCard(
+                              title: 'Conversion run',
+                              controller: _conversionRunController,
+                              onRunConversion: _runConversion,
+                              canRun: !_toolPathsController.isLoading &&
+                                  !_conversionRunController.isRunning,
                             ),
                           ),
                         ],
@@ -141,6 +141,34 @@ class _ConversionShellPageState extends State<ConversionShellPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _runConversion() async {
+    final ffmpegPath = _toolPathsController.effectiveFfmpegPath;
+    final ffprobePath = _toolPathsController.effectiveFfprobePath;
+
+    if (ffmpegPath == null || ffprobePath == null) {
+      _showSnackBar('ffmpeg and ffprobe must be configured before converting.');
+      return;
+    }
+
+    if (!_toolPathsController.ffmpegValidation.isValid ||
+        !_toolPathsController.ffprobeValidation.isValid) {
+      _showSnackBar('Fix the tool paths before converting.');
+      return;
+    }
+
+    final request = _conversionSetupController.buildRequest(
+      ffmpegPath: ffmpegPath,
+      ffprobePath: ffprobePath,
+    );
+
+    if (request == null) {
+      _showSnackBar('Select a source and fix the trim fields first.');
+      return;
+    }
+
+    await _conversionRunController.run(request);
   }
 
   void _syncTextControllers() {
@@ -278,16 +306,20 @@ class _ConversionShellPageState extends State<ConversionShellPage> {
       return;
     }
 
-    final messenger = ScaffoldMessenger.of(context);
     final message = Platform.isLinux
         ? 'Desktop picker failed. Falling back to manual path entry.'
         : 'Picker failed. Falling back to manual path entry.';
 
+    _showSnackBar(message);
+
+    debugPrint('Picker error: $error');
+  }
+
+  void _showSnackBar(String message) {
+    final messenger = ScaffoldMessenger.of(context);
     messenger
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(message)));
-
-    debugPrint('Picker error: $error');
   }
 
   Future<String?> _showManualPathDialog({
@@ -409,58 +441,6 @@ class _HeaderBanner extends StatelessWidget {
             ],
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _WorkflowCard extends StatelessWidget {
-  const _WorkflowCard({
-    required this.title,
-    required this.description,
-    required this.bullets,
-  });
-
-  final String title;
-  final String description;
-  final List<String> bullets;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(description, style: theme.textTheme.bodyLarge),
-            const SizedBox(height: 16),
-            for (final bullet in bullets)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(top: 5),
-                      child: Icon(Icons.fiber_manual_record, size: 10),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(child: Text(bullet)),
-                  ],
-                ),
-              ),
-          ],
-        ),
       ),
     );
   }
@@ -892,6 +872,151 @@ class _TrimCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ExecutionCard extends StatelessWidget {
+  const _ExecutionCard({
+    required this.title,
+    required this.controller,
+    required this.onRunConversion,
+    required this.canRun,
+  });
+
+  final String title;
+  final ConversionRunController controller;
+  final Future<void> Function() onRunConversion;
+  final bool canRun;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    title,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: controller.results.isEmpty ? null : controller.clearResults,
+                  child: const Text('Clear results'),
+                ),
+                const SizedBox(width: 12),
+                FilledButton.icon(
+                  onPressed: canRun ? onRunConversion : null,
+                  icon: Icon(controller.isRunning ? Icons.sync : Icons.play_arrow),
+                  label: Text(controller.isRunning ? 'Running...' : 'Convert'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            if (controller.totalJobs > 0) ...[
+              LinearProgressIndicator(value: controller.progress),
+              const SizedBox(height: 8),
+              Text(
+                '${controller.completedJobs}/${controller.totalJobs} processed'
+                '${controller.currentItem == null ? '' : ' • ${path.basename(controller.currentItem!)}'}',
+              ),
+              const SizedBox(height: 16),
+            ],
+            if (controller.errorMessage != null) ...[
+              Text(
+                controller.errorMessage!,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.error,
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+            if (controller.results.isEmpty)
+              Text(
+                'The next implementation block is live: scan the selected source, probe with ffprobe, build output jobs, and run ffmpeg sequentially.',
+                style: theme.textTheme.bodyLarge,
+              )
+            else
+              Column(
+                children: [
+                  for (final result in controller.results)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: _ResultRow(result: result),
+                    ),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ResultRow extends StatelessWidget {
+  const _ResultRow({required this.result});
+
+  final ConversionResult result;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final statusColor = switch (result.status) {
+      ConversionStatus.success => const Color(0xFF1F7A4C),
+      ConversionStatus.failed => theme.colorScheme.error,
+      ConversionStatus.skipped => const Color(0xFF8A6D1D),
+      ConversionStatus.queued => theme.colorScheme.primary,
+    };
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF7F8FA),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  path.basename(result.sourcePath),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Text(
+                result.status.name,
+                style: theme.textTheme.labelLarge?.copyWith(color: statusColor),
+              ),
+            ],
+          ),
+          if (result.destinationPath.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text(result.destinationPath, style: theme.textTheme.bodySmall),
+          ],
+          if (result.errorMessage != null) ...[
+            const SizedBox(height: 6),
+            Text(
+              result.errorMessage!,
+              style: theme.textTheme.bodySmall?.copyWith(color: statusColor),
+            ),
+          ],
+        ],
       ),
     );
   }
