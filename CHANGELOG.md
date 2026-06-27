@@ -25,7 +25,8 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - Cross-platform desktop window sizing through Flutter using `window_manager`.
 - Persistence for the last directory used in file, folder, and executable picker flows.
 - Persistent per-file conversion logs with stored `ffmpeg` output and an in-app viewer from the results list.
-- GitHub Actions release workflows for Linux, Windows, and macOS desktop bundles.
+- GitHub Actions release workflows for Linux and Windows desktop bundles.
+- Codemagic release workflow for macOS desktop bundles.
 
 ### Changed
 
@@ -41,7 +42,7 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - Run startup log cleanup in the background so app launch does not wait for it.
 - Skip conversion for files that are already in accepted Resolve-friendly formats such as CFR H.264 MP4, ProRes, DNxHR, BRAW/CinemaDNG, and 48 kHz / 24-bit WAV/BWF.
 - Switch the default converted video container from `MOV` to `MXF`.
-- macOS release workflow now builds a DMG package similar to the Mapiah Codemagic flow.
+- macOS release automation now builds a DMG package in Codemagic similar to the Mapiah flow.
 - Linux release workflow now also builds an AppImage package similar to the Mapiah release flow.
 - Windows release workflow now builds an installable `.exe` package similar to the Mapiah release flow.
 - Wired the shared `resolve_file_converter-icon.png` asset into Windows, macOS, and Linux packaging icons.

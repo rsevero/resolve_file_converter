@@ -35,7 +35,8 @@ flutter test
 
 ## Releases
 
-- GitHub Actions release workflows are available for Linux, Windows, and macOS desktop builds
+- GitHub Actions release workflows are available for Linux and Windows desktop builds
+- Codemagic handles the macOS desktop release build
 - Tag releases with `vX.Y.Z` to trigger automated release bundles
 - Linux releases include both a tarball bundle and an AppImage
 - Windows releases are packaged as installer `.exe` files

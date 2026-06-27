@@ -1,6 +1,9 @@
 # Release builds
 
-This project now includes GitHub Actions release workflows similar in spirit to the ones used in `~/devel/mapiah`, adapted to this app's current packaging state.
+This project uses split release automation:
+
+- GitHub Actions for Linux and Windows
+- Codemagic for macOS
 
 ## Current release targets
 
@@ -9,7 +12,7 @@ This project now includes GitHub Actions release workflows similar in spirit to 
 - Windows installer `.exe`
 - macOS DMG package
 
-These workflows build the existing Flutter desktop outputs and upload them to the GitHub release for a tag.
+These release pipelines build the existing Flutter desktop outputs and upload them to the GitHub release for a tag.
 
 ## Triggering a release
 
@@ -25,10 +28,11 @@ git push origin v1.0.0
 
 ## Workflow behavior
 
-- Trigger on tags matching `vX.Y.Z`
-- Also support manual `workflow_dispatch` runs with a `test_tag`
-- Build with Flutter `3.44.4`
-- Upload assets to the matching GitHub release
+- Linux and Windows GitHub Actions trigger on tags matching `vX.Y.Z`
+- The macOS Codemagic workflow triggers on tags matching `vX.Y.Z`
+- The macOS Codemagic workflow also supports manual runs by setting `RELEASE_TAG_PARAM`
+- All release automation builds with Flutter `3.44.4`
+- All release automation uploads assets to the matching GitHub release
 
 ## Produced asset names
 
@@ -42,4 +46,5 @@ git push origin v1.0.0
 - These are release bundles, not signed installers
 - Linux now also builds an AppImage package, but not Flatpak
 - Windows now builds an Inno Setup installer executable
-- macOS now builds a DMG package, but it is not yet signed or notarized
+- macOS now builds a DMG package in Codemagic, but it is not yet signed or notarized
+- Codemagic expects a secret group named `resolve_file_converter_github_token` with `GITHUB_TOKEN` set for release publishing

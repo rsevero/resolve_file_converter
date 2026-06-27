@@ -1,0 +1,146 @@
+workflows:
+  build-macos:
+    name: Build macOS
+    environment:
+      flutter: 3.44.4
+      xcode: latest
+      cocoapods: default
+      groups:
+        - resolve_file_converter_github_token
+      vars:
+        RELEASE_TAG_PARAM: "v1.0.0-test"
+
+    triggering:
+      events:
+        - tag
+      tag_patterns:
+        - pattern: 'v+([0-9]).+([0-9]).+([0-9])'
+          include: true
+
+    scripts:
+      - name: Set release tag variable
+        script: |
+          set -e
+          if [ -n "$CM_TAG" ]; then
+            export RELEASE_TAG="$CM_TAG"
+          else
+            export RELEASE_TAG="$RELEASE_TAG_PARAM"
+          fi
+          echo "RELEASE_TAG=$RELEASE_TAG" >> "$CM_ENV"
+          echo "RELEASE_TAG is: $RELEASE_TAG"
+
+      - name: Set installer path
+        script: |
+          set -e
+          export INSTALLER="build/macos/resolve-file-converter-${RELEASE_TAG#v}-macos-universal.dmg"
+          echo "INSTALLER=$INSTALLER" >> "$CM_ENV"
+          echo "Defined INSTALLER as: $INSTALLER"
+
+      - name: Enable macOS build
+        script: |
+          set -e
+          flutter config --enable-macos-desktop
+          defaults write com.apple.dt.Xcode IDEPackageSupportUseBuiltinSCM YES
+
+      - name: Get Flutter dependencies
+        script: |
+          set -e
+          flutter pub get
+
+      - name: Clean CocoaPods
+        script: |
+          set -e
+          rm -rf macos/Pods macos/Podfile.lock
+          cd macos
+          pod install --repo-update
+          cd ..
+
+      - name: Build macOS release
+        script: |
+          set -e
+          flutter build macos --release
+
+      - name: Create DMG
+        script: |
+          set -e
+
+          APP_PATH="build/macos/Build/Products/Release/resolve_file_converter.app"
+          if [ ! -d "$APP_PATH" ]; then
+            echo "Expected app not found at $APP_PATH; searching for *.app in build output..."
+            APP_PATH="$(find build/macos/Build/Products/Release -maxdepth 1 -name '*.app' -print -quit)"
+          fi
+          if [ -z "$APP_PATH" ] || [ ! -d "$APP_PATH" ]; then
+            echo "ERROR: Could not find built .app in build/macos/Build/Products/Release"
+            ls -la build/macos/Build/Products/Release || true
+            exit 1
+          fi
+          echo "Using app bundle: $APP_PATH"
+
+          ICONSET_DIR="build/dmg_icon.iconset"
+          ICNS_PATH="build/dmg_icon.icns"
+          rm -rf "$ICONSET_DIR" "$ICNS_PATH"
+          mkdir -p "$ICONSET_DIR"
+
+          cp macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_16.png "$ICONSET_DIR/icon_16x16.png"
+          cp macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_32.png "$ICONSET_DIR/icon_16x16@2x.png"
+          cp macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_32.png "$ICONSET_DIR/icon_32x32.png"
+          cp macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_64.png "$ICONSET_DIR/icon_32x32@2x.png"
+          cp macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_128.png "$ICONSET_DIR/icon_128x128.png"
+          cp macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_256.png "$ICONSET_DIR/icon_128x128@2x.png"
+          cp macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_256.png "$ICONSET_DIR/icon_256x256.png"
+          cp macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_512.png "$ICONSET_DIR/icon_256x256@2x.png"
+          cp macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_512.png "$ICONSET_DIR/icon_512x512.png"
+          cp macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_1024.png "$ICONSET_DIR/icon_512x512@2x.png"
+
+          iconutil -c icns "$ICONSET_DIR" -o "$ICNS_PATH"
+
+          mkdir -p "$APP_PATH/Contents/Resources"
+          cp "$ICNS_PATH" "$APP_PATH/Contents/Resources/AppIcon.icns"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleIconFile AppIcon" "$APP_PATH/Contents/Info.plist" 2>/dev/null \
+            || /usr/libexec/PlistBuddy -c "Add :CFBundleIconFile string AppIcon" "$APP_PATH/Contents/Info.plist"
+
+          brew install node
+          npm install -g appdmg
+          appdmg appdmg.json "$INSTALLER"
+
+      - name: Verify DMG
+        script: |
+          set -e
+          chmod +x scripts/verify_dmg.sh
+          scripts/verify_dmg.sh "$INSTALLER"
+
+      - name: Collect macOS unified logs
+        script: |
+          set -e
+          mkdir -p build/macos/test-logs
+          log show --last 5m --style compact \
+            --predicate 'process == "resolve_file_converter" OR process == "Resolve File Converter"' \
+            > build/macos/test-logs/unified.log || true
+
+    artifacts:
+      - build/macos/resolve-file-converter-*-macos-universal.dmg
+      - build/macos/test-logs/*
+
+    publishing:
+      scripts:
+        - name: Create GitHub Release with GH CLI
+          script: |
+            set -e
+            TITLE="Resolve File Converter $RELEASE_TAG"
+
+            GH_TOKEN=$GITHUB_TOKEN
+            unset GITHUB_TOKEN
+            gh auth login --with-token <<< "$GH_TOKEN"
+
+            if ! gh release view "$RELEASE_TAG" 2>/dev/null; then
+              echo "Creating new release..."
+              gh release create "$RELEASE_TAG" \
+                --title "$TITLE" \
+                --notes "Release $RELEASE_TAG" \
+                "$INSTALLER"
+            else
+              echo "Release exists - uploading assets..."
+              gh release upload "$RELEASE_TAG" \
+                --clobber \
+                "$INSTALLER"
+            fi
