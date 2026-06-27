@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
+## v1.0.1
+
+### Changed
+
+- Show the newest completed conversion result at the top of the run history instead of appending it to the bottom.
+
 ## v1.0.0
 
 ### Added
@@ -42,7 +48,6 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - Run startup log cleanup in the background so app launch does not wait for it.
 - Skip conversion for files that are already in accepted Resolve-friendly formats such as CFR H.264 MP4, ProRes, DNxHR, BRAW/CinemaDNG, and 48 kHz / 24-bit WAV/BWF.
 - Switch the default converted video container from `MOV` to `MXF`.
-- Show the newest completed conversion result at the top of the run history instead of appending it to the bottom.
 - macOS release automation now builds a DMG package in Codemagic similar to the Mapiah flow.
 - Linux release workflow now also builds an AppImage package similar to the Mapiah release flow.
 - Windows release workflow now builds an installable `.exe` package similar to the Mapiah release flow.
