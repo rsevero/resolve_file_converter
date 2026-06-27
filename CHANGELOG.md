@@ -43,6 +43,7 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - Switch the default converted video container from `MOV` to `MXF`.
 - macOS release workflow now builds a DMG package similar to the Mapiah Codemagic flow.
 - Linux release workflow now also builds an AppImage package similar to the Mapiah release flow.
+- Windows release workflow now builds an installable `.exe` package similar to the Mapiah release flow.
 
 ### Fixed
 

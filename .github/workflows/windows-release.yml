@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build:
-    name: Build Windows Bundle
+    name: Build Windows Installer
     runs-on: windows-latest
     steps:
       - name: Validate tag (automatic runs only)
@@ -51,13 +51,37 @@ jobs:
           flutter pub get
           flutter build windows --release
 
-      - name: Archive Windows bundle
+      - name: Install Inno Setup
+        run: choco install innosetup -y
+
+      - name: Prepare installer files
+        shell: bash
+        run: |
+          mkdir -p build/windows-installer
+          cp packaging/windows/resolve_file_converter.iss build/windows-installer/
+
+      - name: Create Inno Setup installer
+        shell: cmd
+        run: |
+          set BUILD_DIR=%GITHUB_WORKSPACE%\build\windows\x64\runner\Release
+          set OUTPUT_DIR=%GITHUB_WORKSPACE%\build\windows-installer
+
+          for /f "tokens=*" %%i in ('powershell -command "(Get-Item '%BUILD_DIR%\resolve_file_converter.exe').VersionInfo.ProductVersion"') do set APP_VERSION=%%i
+
+          powershell -Command "(Get-Content '%OUTPUT_DIR%\resolve_file_converter.iss') -replace 'C:\\resolve_file_converter\\build\\windows', '%GITHUB_WORKSPACE%\\build\\windows' -replace 'Resolve-File-Converter-v\\{#AppVersion\\}-windows-x64', 'resolve-file-converter-${{ github.event_name == 'push' && github.ref_name || github.event.inputs.test_tag }}-windows-x64' | Set-Content '%OUTPUT_DIR%\resolve_file_converter.iss'"
+
+          "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "%OUTPUT_DIR%\resolve_file_converter.iss"
+
+      - name: Set installer asset name
         shell: pwsh
         run: |
           $tag = if ("${{ github.event_name }}" -eq "push") { "${{ github.ref_name }}" } else { "${{ github.event.inputs.test_tag }}" }
-          $tagNumber = $tag.Substring(1)
-          $assetName = "resolve-file-converter-$tagNumber-windows-x64.zip"
-          Compress-Archive -Path "build/windows/x64/runner/Release/*" -DestinationPath $assetName -Force
+          $assetName = "resolve-file-converter-$tag-windows-x64.exe"
+          Rename-Item -Path "build/windows-installer/resolve-file-converter-$tag-windows-x64.exe" -NewName $assetName -Force -ErrorAction SilentlyContinue
+          if (-not (Test-Path $assetName)) {
+            $generated = Get-ChildItem "build/windows-installer/*.exe" | Select-Object -First 1
+            Copy-Item $generated.FullName $assetName -Force
+          }
           "TAG=$tag" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           "ASSET_NAME=$assetName" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
