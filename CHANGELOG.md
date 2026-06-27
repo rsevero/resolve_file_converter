@@ -49,3 +49,4 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 ### Fixed
 
 - Removed the accidentally committed nested duplicate Flutter project from the repository.
+- Bundled `libpcre3` for Linux AppImage builds so the packaged `gdk-pixbuf-query-loaders` step can generate the pixbuf loader cache on GitHub Actions.
