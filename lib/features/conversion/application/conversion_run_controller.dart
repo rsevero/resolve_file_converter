@@ -95,7 +95,7 @@ class ConversionRunController extends ChangeNotifier {
 
     if (resolution.candidatePaths.isEmpty) {
       _errorMessage = 'No file candidates were found for conversion.';
-      _results = results;
+      _results = List.unmodifiable(results.reversed);
       _isRunning = false;
       notifyListeners();
       return;
@@ -114,23 +114,23 @@ class ConversionRunController extends ChangeNotifier {
       );
 
       if (probeResult.mediaKind == MediaKind.unsupported) {
-        results.add(
-          ConversionResult(
+        final result = ConversionResult(
+          sourcePath: sourcePath,
+          destinationPath: '',
+          status: ConversionStatus.skipped,
+          mediaKind: MediaKind.unsupported,
+          errorMessage: probeResult.errorMessage ?? 'Unsupported file.',
+          logFilePath: await _conversionLogService.writeLog(
             sourcePath: sourcePath,
             destinationPath: '',
             status: ConversionStatus.skipped,
             mediaKind: MediaKind.unsupported,
             errorMessage: probeResult.errorMessage ?? 'Unsupported file.',
-            logFilePath: await _conversionLogService.writeLog(
-              sourcePath: sourcePath,
-              destinationPath: '',
-              status: ConversionStatus.skipped,
-              mediaKind: MediaKind.unsupported,
-              errorMessage: probeResult.errorMessage ?? 'Unsupported file.',
-              note: 'ffprobe did not report a supported audio or video stream.',
-            ),
+            note: 'ffprobe did not report a supported audio or video stream.',
           ),
         );
+        results.add(result);
+        _publishResults(results);
         _completedJobs++;
         notifyListeners();
         continue;
@@ -139,24 +139,24 @@ class ConversionRunController extends ChangeNotifier {
       if (probeResult.isAcceptedForResolve) {
         final acceptedFormatLabel =
             probeResult.acceptedFormatLabel ?? 'already accepted by Resolve';
-        results.add(
-          ConversionResult(
+        final result = ConversionResult(
+          sourcePath: sourcePath,
+          destinationPath: sourcePath,
+          status: ConversionStatus.skipped,
+          mediaKind: probeResult.mediaKind,
+          errorMessage: 'Skipped because it is already in an accepted format: $acceptedFormatLabel.',
+          logFilePath: await _conversionLogService.writeLog(
             sourcePath: sourcePath,
             destinationPath: sourcePath,
             status: ConversionStatus.skipped,
             mediaKind: probeResult.mediaKind,
-            errorMessage: 'Skipped because it is already in an accepted format: $acceptedFormatLabel.',
-            logFilePath: await _conversionLogService.writeLog(
-              sourcePath: sourcePath,
-              destinationPath: sourcePath,
-              status: ConversionStatus.skipped,
-              mediaKind: probeResult.mediaKind,
-              errorMessage:
-                  'Skipped because it is already in an accepted format: $acceptedFormatLabel.',
-              note: 'No conversion was run because the source is already Resolve-friendly.',
-            ),
+            errorMessage:
+                'Skipped because it is already in an accepted format: $acceptedFormatLabel.',
+            note: 'No conversion was run because the source is already Resolve-friendly.',
           ),
         );
+        results.add(result);
+        _publishResults(results);
         _completedJobs++;
         notifyListeners();
         continue;
@@ -181,13 +181,18 @@ class ConversionRunController extends ChangeNotifier {
       );
 
       results.add(result);
+      _publishResults(results);
       _completedJobs++;
       notifyListeners();
     }
 
-    _results = results;
+    _publishResults(results);
     _currentItem = null;
     _isRunning = false;
     notifyListeners();
+  }
+
+  void _publishResults(List<ConversionResult> results) {
+    _results = List.unmodifiable(results.reversed);
   }
 }

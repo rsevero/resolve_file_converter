@@ -1,9 +1,15 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:resolve_file_converter/features/conversion/application/conversion_run_controller.dart';
 import 'package:resolve_file_converter/models/conversion_enums.dart';
 import 'package:resolve_file_converter/models/conversion_request.dart';
+import 'package:resolve_file_converter/models/conversion_result.dart';
+import 'package:resolve_file_converter/models/media_probe_result.dart';
+import 'package:resolve_file_converter/models/resolved_job.dart';
+import 'package:resolve_file_converter/models/source_resolution_result.dart';
 import 'package:resolve_file_converter/services/conversion_log_service.dart';
+import 'package:resolve_file_converter/services/conversion_execution_service.dart';
 import 'package:resolve_file_converter/services/ffmpeg_command_service.dart';
 import 'package:resolve_file_converter/services/media_probe_service.dart';
 import 'package:resolve_file_converter/services/output_path_service.dart';
@@ -236,4 +242,96 @@ void main() {
       expect(Directory('${tempDir.path}/logs').listSync(), isEmpty);
     });
   });
+
+  group('ConversionRunController', () {
+    test('keeps the newest completed result at the top', () async {
+      final controller = ConversionRunController(
+        sourceResolutionService: _FakeSourceResolutionService(
+          const SourceResolutionResult(
+            candidatePaths: ['/tmp/alpha.mov', '/tmp/bravo.mov'],
+            skippedPaths: [],
+          ),
+        ),
+        mediaProbeService: const _FakeMediaProbeService(),
+        outputPathService: const _FakeOutputPathService(),
+        ffmpegCommandService: const FfmpegCommandService(),
+        conversionExecutionService: const _FakeConversionExecutionService(),
+        conversionLogService: const ConversionLogService(rootDirectoryPath: '/tmp'),
+      );
+
+      final request = ConversionRequest(
+        sourcePath: '/tmp',
+        sourceType: SourceType.directory,
+        outputMode: OutputMode.sameFolderSuffix,
+        ffmpegPath: 'ffmpeg',
+        ffprobePath: 'ffprobe',
+      );
+
+      await controller.run(request);
+
+      expect(
+        controller.results.map((result) => result.sourcePath).toList(),
+        ['/tmp/bravo.mov', '/tmp/alpha.mov'],
+      );
+    });
+  });
+}
+
+class _FakeSourceResolutionService extends SourceResolutionService {
+  const _FakeSourceResolutionService(this.result);
+
+  final SourceResolutionResult result;
+
+  @override
+  Future<SourceResolutionResult> resolve({
+    required String sourcePath,
+    required SourceType sourceType,
+  }) async {
+    return result;
+  }
+}
+
+class _FakeMediaProbeService extends MediaProbeService {
+  const _FakeMediaProbeService();
+
+  @override
+  Future<MediaProbeResult> probe({
+    required String ffprobePath,
+    required String sourcePath,
+  }) async {
+    return MediaProbeResult(
+      sourcePath: sourcePath,
+      mediaKind: MediaKind.video,
+    );
+  }
+}
+
+class _FakeOutputPathService extends OutputPathService {
+  const _FakeOutputPathService();
+
+  @override
+  Future<String> buildDestinationPath({
+    required String sourcePath,
+    required MediaKind mediaKind,
+    required OutputMode outputMode,
+  }) async {
+    return '$sourcePath.converted';
+  }
+}
+
+class _FakeConversionExecutionService extends ConversionExecutionService {
+  const _FakeConversionExecutionService();
+
+  @override
+  Future<ConversionResult> execute({
+    required String ffmpegPath,
+    required ResolvedJob job,
+  }) async {
+    return ConversionResult(
+      sourcePath: job.sourcePath,
+      destinationPath: job.destinationPath,
+      status: ConversionStatus.success,
+      mediaKind: job.mediaKind,
+    );
+  }
 }
