@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+
+Name=Resolve File Converter
+Comment=Convert media files into Resolve-friendly formats
+Categories=AudioVideo;Utility;
+
+Icon=resolve_file_converter
+Exec=AppRun
+Terminal=false
+StartupWMClass=Resolve File Converter

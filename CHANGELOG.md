@@ -42,6 +42,7 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - Skip conversion for files that are already in accepted Resolve-friendly formats such as CFR H.264 MP4, ProRes, DNxHR, BRAW/CinemaDNG, and 48 kHz / 24-bit WAV/BWF.
 - Switch the default converted video container from `MOV` to `MXF`.
 - macOS release workflow now builds a DMG package similar to the Mapiah Codemagic flow.
+- Linux release workflow now also builds an AppImage package similar to the Mapiah release flow.
 
 ### Fixed
 

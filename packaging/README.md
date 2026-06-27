@@ -5,6 +5,7 @@ This project now includes GitHub Actions release workflows similar in spirit to 
 ## Current release targets
 
 - Linux bundle as `.tar.gz`
+- Linux AppImage package
 - Windows bundle as `.zip`
 - macOS DMG package
 
@@ -32,12 +33,13 @@ git push origin v1.0.0
 ## Produced asset names
 
 - `resolve-file-converter-<version>-linux-x86_64.tar.gz`
+- `resolve-file-converter-<version>-linux-x86_64.AppImage`
 - `resolve-file-converter-<version>-windows-x64.zip`
 - `resolve-file-converter-<version>-macos-universal.dmg`
 
 ## Notes
 
 - These are release bundles, not signed installers
-- Linux does not yet build AppImage or Flatpak
+- Linux now also builds an AppImage package, but not Flatpak
 - Windows does not yet build an installer executable
 - macOS now builds a DMG package, but it is not yet signed or notarized
