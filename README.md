@@ -5,7 +5,7 @@ Flutter desktop app for converting `ffmpeg`-readable audio and video files into 
 ## Current behavior
 
 - Audio sources convert to `48 kHz / 24-bit PCM WAV`
-- Video sources convert to `MOV` with `DNxHR HQ` video and `48 kHz PCM` audio
+- Video sources convert to `MXF` with `DNxHR HQ` video and `48 kHz PCM` audio
 - Input can be a single file or one directory
 - Directory mode scans only the selected folder's top level
 - Output can stay in the same folder with a `-for_resolve` suffix or go into a `for_resolve` subdirectory

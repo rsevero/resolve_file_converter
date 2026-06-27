@@ -12,7 +12,7 @@ class OutputPathService {
     required MediaKind mediaKind,
     required OutputMode outputMode,
   }) async {
-    final extension = mediaKind == MediaKind.video ? '.mov' : '.wav';
+    final extension = mediaKind == MediaKind.video ? '.mxf' : '.wav';
     final sourceDirectory = path.dirname(sourcePath);
     final baseName = path.basenameWithoutExtension(sourcePath);
 

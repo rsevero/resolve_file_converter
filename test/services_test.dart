@@ -169,13 +169,13 @@ void main() {
       final job = const FfmpegCommandService().buildJob(
         request: request,
         sourcePath: '/tmp/source.mov',
-        destinationPath: '/tmp/source-for_resolve.mov',
+        destinationPath: '/tmp/source-for_resolve.mxf',
         mediaKind: MediaKind.video,
       );
 
       expect(job.arguments, containsAllInOrder(['-c:v', 'dnxhd']));
       expect(job.arguments, containsAllInOrder(['-profile:v', 'dnxhr_hq']));
-      expect(job.arguments.last, '/tmp/source-for_resolve.mov');
+      expect(job.arguments.last, '/tmp/source-for_resolve.mxf');
     });
   });
 
@@ -187,11 +187,11 @@ void main() {
 
       final logFilePath = await service.writeLog(
         sourcePath: '/tmp/source.mov',
-        destinationPath: '/tmp/source-for_resolve.mov',
+        destinationPath: '/tmp/source-for_resolve.mxf',
         status: ConversionStatus.success,
         mediaKind: MediaKind.video,
         ffmpegPath: '/usr/bin/ffmpeg',
-        arguments: const ['-i', '/tmp/source.mov', '/tmp/source-for_resolve.mov'],
+        arguments: const ['-i', '/tmp/source.mov', '/tmp/source-for_resolve.mxf'],
         exitCode: 0,
         stdoutOutput: 'frame=100',
         stderrOutput: 'ffmpeg banner',
@@ -214,7 +214,7 @@ void main() {
 
       final firstLogPath = await service.writeLog(
         sourcePath: '/tmp/source-a.mov',
-        destinationPath: '/tmp/source-a-for_resolve.mov',
+        destinationPath: '/tmp/source-a-for_resolve.mxf',
         status: ConversionStatus.success,
         mediaKind: MediaKind.video,
       );

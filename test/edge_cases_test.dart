@@ -80,7 +80,7 @@ void main() {
         outputMode: OutputMode.resolveSubdirectory,
       );
 
-      expect(destination, '${tempDir.path}/for_resolve/clip.mov');
+      expect(destination, '${tempDir.path}/for_resolve/clip.mxf');
       expect(Directory('${tempDir.path}/for_resolve').existsSync(), isTrue);
     });
   });

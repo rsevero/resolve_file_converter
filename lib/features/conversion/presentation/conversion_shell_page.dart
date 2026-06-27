@@ -812,8 +812,8 @@ class _OutputModeCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               controller.outputMode == OutputMode.sameFolderSuffix
-                  ? 'Example: clip-for_resolve.mov'
-                  : 'Example: for_resolve/clip.mov',
+                  ? 'Example: clip-for_resolve.mxf'
+                  : 'Example: for_resolve/clip.mxf',
               style: theme.textTheme.bodyMedium,
             ),
             const SizedBox(height: 12),
@@ -842,7 +842,7 @@ class _OutputModeCard extends StatelessWidget {
         ? 'source_name'
         : path.basenameWithoutExtension(sourcePath);
 
-    final extension = controller.sourceType == SourceType.file ? '.wav or .mov' : '.wav / .mov';
+    final extension = controller.sourceType == SourceType.file ? '.wav or .mxf' : '.wav / .mxf';
 
     return switch (controller.outputMode) {
       OutputMode.sameFolderSuffix =>
