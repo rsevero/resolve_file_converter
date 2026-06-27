@@ -130,5 +130,34 @@ void main() {
       expect(content, contains('ffmpeg banner'));
       expect(File(logFilePath).existsSync(), isTrue);
     });
+
+    test('deletes all stored log files', () async {
+      final tempDir = await Directory.systemTemp.createTemp('resolve-logs-cleanup');
+      addTearDown(() => tempDir.delete(recursive: true));
+      final service = ConversionLogService(rootDirectoryPath: tempDir.path);
+
+      final firstLogPath = await service.writeLog(
+        sourcePath: '/tmp/source-a.mov',
+        destinationPath: '/tmp/source-a-for_resolve.mov',
+        status: ConversionStatus.success,
+        mediaKind: MediaKind.video,
+      );
+      final secondLogPath = await service.writeLog(
+        sourcePath: '/tmp/source-b.wav',
+        destinationPath: '/tmp/source-b-for_resolve.wav',
+        status: ConversionStatus.failed,
+        mediaKind: MediaKind.audio,
+      );
+
+      expect(firstLogPath, isNotNull);
+      expect(secondLogPath, isNotNull);
+
+      await service.deleteAllLogs();
+
+      expect(File(firstLogPath!).existsSync(), isFalse);
+      expect(File(secondLogPath!).existsSync(), isFalse);
+      expect(Directory('${tempDir.path}/logs').existsSync(), isTrue);
+      expect(Directory('${tempDir.path}/logs').listSync(), isEmpty);
+    });
   });
 }

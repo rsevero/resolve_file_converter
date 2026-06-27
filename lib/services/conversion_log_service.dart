@@ -53,6 +53,19 @@ class ConversionLogService {
     return File(logFilePath).readAsString();
   }
 
+  Future<void> deleteAllLogs() async {
+    final logsDirectory = await _resolveLogsDirectory();
+    if (!await logsDirectory.exists()) {
+      return;
+    }
+
+    await for (final entry in logsDirectory.list(followLinks: false)) {
+      if (entry is File) {
+        await entry.delete();
+      }
+    }
+  }
+
   Future<Directory> _resolveLogsDirectory() async {
     final basePath = rootDirectoryPath ?? _defaultRootDirectoryPath();
     final logsDirectory = Directory(path.join(basePath, 'logs'));

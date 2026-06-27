@@ -36,6 +36,7 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - Replaced the ineffective runner-specific startup sizing attempt with a Flutter-managed desktop window configuration.
 - Reused the last-picked directory as the initial location for future source and tool picker dialogs.
 - Clear the current source selection after a conversion run while keeping the remembered picker directory for future browsing.
+- Clear all persisted conversion log files automatically when the app starts.
 
 ### Fixed
 
