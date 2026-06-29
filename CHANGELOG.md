@@ -15,6 +15,7 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - Made the Codemagic macOS release upload step tolerate GitHub release creation races so tagged Linux, Windows, and macOS builds can all publish to the same release reliably.
 - Made the Codemagic macOS dependency-preparation step skip CocoaPods cleanly when `macos/Podfile` is not present, so manual builds can continue to the actual Flutter build.
 - Removed the invalid `appdmg` background setting that made Codemagic macOS DMG packaging fail by treating `builtin-arrow` as a missing file path.
+- Fixed DMG verification on Codemagic by parsing mounted volume paths with spaces correctly and by falling back to the first app bundle found in the mounted image.
 
 ## v1.0.1 - release 2026-06-29
 

@@ -16,11 +16,23 @@ hdiutil verify "${DMG_PATH}"
 
 echo "== Mount DMG =="
 ATTACH_OUT="$(hdiutil attach -nobrowse -readonly "${DMG_PATH}")"
-MOUNT_POINT="$(echo "${ATTACH_OUT}" | awk '/\/Volumes\// {print $3; exit}')"
+MOUNT_POINT="$(echo "${ATTACH_OUT}" | sed -n 's#^.*\(/Volumes/.*\)$#\1#p' | head -n 1)"
+if [[ -z "${MOUNT_POINT}" ]]; then
+  echo "ERROR: Could not determine mounted DMG path from hdiutil output."
+  echo "${ATTACH_OUT}"
+  exit 1
+fi
 echo "Mounted at: ${MOUNT_POINT}"
 
 APP="${MOUNT_POINT}/resolve_file_converter.app"
-test -d "${APP}"
+if [[ ! -d "${APP}" ]]; then
+  APP="$(find "${MOUNT_POINT}" -maxdepth 1 -name '*.app' -type d -print -quit)"
+fi
+if [[ -z "${APP}" || ! -d "${APP}" ]]; then
+  echo "ERROR: Could not find an app bundle in ${MOUNT_POINT}."
+  ls -la "${MOUNT_POINT}" || true
+  exit 1
+fi
 
 echo "== Check /Applications link exists =="
 test -L "${MOUNT_POINT}/Applications" || test -e "${MOUNT_POINT}/Applications"
