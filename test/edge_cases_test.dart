@@ -110,6 +110,24 @@ void main() {
       expect(destination, '${tempDir.path}/clip-for_resolve-1.wav');
     });
 
+    test('includes trim times in subdir output name', () async {
+      final tempDir = await Directory.systemTemp.createTemp('resolve-subdir-trim');
+      addTearDown(() => tempDir.delete(recursive: true));
+
+      final destination = await const OutputPathService().buildDestinationPath(
+        sourcePath: '${tempDir.path}/clip.mov',
+        mediaKind: MediaKind.video,
+        outputMode: OutputMode.resolveSubdirectory,
+        startTime: const Duration(minutes: 1, seconds: 2),
+        endTime: const Duration(minutes: 3, seconds: 4, milliseconds: 250),
+      );
+
+      expect(
+        destination,
+        '${tempDir.path}/for_resolve/clip-trim-00h01m02s000ms-to-00h03m04s250ms.mxf',
+      );
+    });
+
     test('creates for_resolve directory for subdir mode', () async {
       final tempDir = await Directory.systemTemp.createTemp('resolve-subdir');
       addTearDown(() => tempDir.delete(recursive: true));

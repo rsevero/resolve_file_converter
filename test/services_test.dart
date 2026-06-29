@@ -154,6 +154,21 @@ void main() {
 
       expect(result, '/tmp/source-for_resolve.wav');
     });
+
+    test('includes trim times in output name when conversion is trimmed', () async {
+      final result = await const OutputPathService().buildDestinationPath(
+        sourcePath: '/tmp/source.wav',
+        mediaKind: MediaKind.audio,
+        outputMode: OutputMode.sameFolderSuffix,
+        startTime: const Duration(seconds: 5),
+        endTime: const Duration(seconds: 12, milliseconds: 500),
+      );
+
+      expect(
+        result,
+        '/tmp/source-trim-00h00m05s000ms-to-00h00m12s500ms-for_resolve.wav',
+      );
+    });
   });
 
   group('FfmpegCommandService', () {
@@ -375,6 +390,8 @@ class _FakeOutputPathService extends OutputPathService {
     required String sourcePath,
     required MediaKind mediaKind,
     required OutputMode outputMode,
+    Duration? startTime,
+    Duration? endTime,
   }) async {
     return '$sourcePath.converted';
   }

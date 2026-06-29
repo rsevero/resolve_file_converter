@@ -166,6 +166,8 @@ class ConversionRunController extends ChangeNotifier {
         sourcePath: sourcePath,
         mediaKind: probeResult.mediaKind,
         outputMode: request.outputMode,
+        startTime: request.startTime,
+        endTime: request.endTime,
       );
 
       final job = _ffmpegCommandService.buildJob(
