@@ -47,13 +47,17 @@ workflows:
           set -e
           flutter pub get
 
-      - name: Clean CocoaPods
+      - name: Prepare macOS dependencies
         script: |
           set -e
-          rm -rf macos/Pods macos/Podfile.lock
-          cd macos
-          pod install --repo-update
-          cd ..
+          if [ -f macos/Podfile ]; then
+            rm -rf macos/Pods macos/Podfile.lock
+            cd macos
+            pod install --repo-update
+            cd ..
+          else
+            echo "No macos/Podfile found; skipping CocoaPods setup."
+          fi
 
       - name: Build macOS release
         script: |
