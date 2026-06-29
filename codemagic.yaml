@@ -14,7 +14,7 @@ workflows:
       events:
         - tag
       tag_patterns:
-        - pattern: 'v+([0-9]).+([0-9]).+([0-9])'
+        - pattern: '^v[0-9]+\.[0-9]+\.[0-9]+$'
           include: true
 
     scripts:
@@ -132,15 +132,15 @@ workflows:
             unset GITHUB_TOKEN
             gh auth login --with-token <<< "$GH_TOKEN"
 
-            if ! gh release view "$RELEASE_TAG" 2>/dev/null; then
-              echo "Creating new release..."
-              gh release create "$RELEASE_TAG" \
+            if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+              if ! gh release create "$RELEASE_TAG" \
                 --title "$TITLE" \
                 --notes "Release $RELEASE_TAG" \
-                "$INSTALLER"
-            else
-              echo "Release exists - uploading assets..."
-              gh release upload "$RELEASE_TAG" \
-                --clobber \
-                "$INSTALLER"
+                "$INSTALLER"; then
+                echo "Release creation failed (likely already exists); continuing to upload."
+              fi
             fi
+
+            gh release upload "$RELEASE_TAG" \
+              --clobber \
+              "$INSTALLER"
