@@ -13,6 +13,7 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ### Fixed
 
+- Replaced the Linux release workflow's cached apt-package action with a direct `apt-get` install step so GitHub Actions dependency setup is less likely to stall before the AppImage build begins.
 - Corrected the Linux AppImage `AppDir` layout so the packaged launcher starts the bundled Flutter executable with its adjacent `lib/` and `data/` directories in the expected location.
 - Updated the Linux AppImage recipe entrypoint metadata so `appimage-builder` resolves the packaged executable from `usr/bin/resolve_file_converter` instead of the old AppDir root path.
 - Trimmed unnecessary `librsvg2` packages from the Linux AppImage recipe because the bundled app assets use PNG icons and do not require SVG runtime support.
