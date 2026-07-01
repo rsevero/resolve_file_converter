@@ -4,11 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
-## Unreleased
+## v1.0.3 - Unreleased
 
 ### Fixed
 
 - Updated the Windows GitHub release workflow to use the renamed `resolve_media_converter` installer script, executable, and packaging path references so Windows release builds continue to work after the app rename.
+- Updated the Codemagic macOS DMG packaging spec and verifier to look for `Resolve Media Converter.app` instead of the old `resolve_media_converter.app` bundle name after the app rename.
 
 ## v1.0.2 - released on 2026-07-01
 

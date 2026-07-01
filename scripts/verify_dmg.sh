@@ -24,7 +24,7 @@ if [[ -z "${MOUNT_POINT}" ]]; then
 fi
 echo "Mounted at: ${MOUNT_POINT}"
 
-APP="${MOUNT_POINT}/resolve_media_converter.app"
+APP="${MOUNT_POINT}/Resolve Media Converter.app"
 if [[ ! -d "${APP}" ]]; then
   APP="$(find "${MOUNT_POINT}" -maxdepth 1 -name '*.app' -type d -print -quit)"
 fi
