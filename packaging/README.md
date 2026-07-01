@@ -47,4 +47,4 @@ git push origin v1.0.0
 - Linux now also builds an AppImage package, but not Flatpak
 - Windows now builds an Inno Setup installer executable
 - macOS now builds a DMG package in Codemagic, but it is not yet signed or notarized
-- Codemagic expects a secret group named `resolve_file_converter_github_token` with `GITHUB_TOKEN` set for release publishing
+- Codemagic expects a secret group named `resolve_media_converter_github_token` with `GITHUB_TOKEN` set for release publishing

@@ -21,7 +21,7 @@ script: |
   export XDG_DATA_DIRS="$APPDIR/usr/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
   export GDK_PIXBUF_MODULE_FILE="$APPDIR/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders.cache"
 
-  exec "$APPDIR/usr/bin/resolve_file_converter" "$@"
+  exec "$APPDIR/usr/bin/resolve_media_converter" "$@"
   APP_RUN_EOF
   chmod +x AppDir/AppRun
 
@@ -32,23 +32,23 @@ script: |
   mkdir -p AppDir/usr/share/icons/hicolor/32x32/apps
   mkdir -p AppDir/usr/share/icons/hicolor/16x16/apps
 
-  cp assets/icons/resolve_file_converter-512.png AppDir/usr/share/icons/hicolor/512x512/apps/resolve_file_converter.png
-  cp assets/icons/resolve_file_converter-256.png AppDir/usr/share/icons/hicolor/256x256/apps/resolve_file_converter.png
-  cp assets/icons/resolve_file_converter-128.png AppDir/usr/share/icons/hicolor/128x128/apps/resolve_file_converter.png
-  cp assets/icons/resolve_file_converter-64.png AppDir/usr/share/icons/hicolor/64x64/apps/resolve_file_converter.png
-  cp assets/icons/resolve_file_converter-32.png AppDir/usr/share/icons/hicolor/32x32/apps/resolve_file_converter.png
-  cp assets/icons/resolve_file_converter-16.png AppDir/usr/share/icons/hicolor/16x16/apps/resolve_file_converter.png
+  cp assets/icons/resolve_media_converter-512.png AppDir/usr/share/icons/hicolor/512x512/apps/resolve_media_converter.png
+  cp assets/icons/resolve_media_converter-256.png AppDir/usr/share/icons/hicolor/256x256/apps/resolve_media_converter.png
+  cp assets/icons/resolve_media_converter-128.png AppDir/usr/share/icons/hicolor/128x128/apps/resolve_media_converter.png
+  cp assets/icons/resolve_media_converter-64.png AppDir/usr/share/icons/hicolor/64x64/apps/resolve_media_converter.png
+  cp assets/icons/resolve_media_converter-32.png AppDir/usr/share/icons/hicolor/32x32/apps/resolve_media_converter.png
+  cp assets/icons/resolve_media_converter-16.png AppDir/usr/share/icons/hicolor/16x16/apps/resolve_media_converter.png
 
   mkdir -p AppDir/usr/share/applications
-  cp packaging/linux/appimage/resolve_file_converter.desktop AppDir/usr/share/applications/
-  ln -sf usr/share/icons/hicolor/512x512/apps/resolve_file_converter.png AppDir/.DirIcon
+  cp packaging/linux/appimage/resolve_media_converter.desktop AppDir/usr/share/applications/
+  ln -sf usr/share/icons/hicolor/512x512/apps/resolve_media_converter.png AppDir/.DirIcon
 AppDir:
   path: ./AppDir
   app_info:
-    id: com.example.resolve_file_converter
+    id: com.example.resolve_media_converter
     name: Resolve Media Converter
     version: 1.0.0
-    exec: usr/bin/resolve_file_converter
+    exec: usr/bin/resolve_media_converter
     exec_args: $@
   apt:
     arch: amd64

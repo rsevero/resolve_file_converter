@@ -6,7 +6,7 @@ workflows:
       xcode: latest
       cocoapods: default
       groups:
-        - resolve_file_converter_github_token
+        - resolve_media_converter_github_token
       vars:
         RELEASE_TAG_PARAM: "v1.0.0-test"
 
@@ -118,7 +118,7 @@ workflows:
           set -e
           mkdir -p build/macos/test-logs
           log show --last 5m --style compact \
-            --predicate 'process == "resolve_file_converter" OR process == "Resolve Media Converter"' \
+            --predicate 'process == "resolve_media_converter" OR process == "Resolve Media Converter"' \
             > build/macos/test-logs/unified.log || true
 
     artifacts:
@@ -132,7 +132,7 @@ workflows:
             set -e
             TITLE="Resolve Media Converter $RELEASE_TAG"
             if [ -z "${GITHUB_TOKEN:-}" ]; then
-              echo "ERROR: GITHUB_TOKEN is not set. Check the resolve_file_converter_github_token variable group in Codemagic."
+              echo "ERROR: GITHUB_TOKEN is not set. Check the resolve_media_converter_github_token variable group in Codemagic."
               exit 1
             fi
 

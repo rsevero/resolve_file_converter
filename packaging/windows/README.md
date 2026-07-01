@@ -4,7 +4,7 @@ This project uses Inno Setup to create an installable Windows `.exe`, following 
 
 ## Output
 
-- `Resolve-File-Converter-v<version>-windows-x64.exe`
+- `Resolve-Media-Converter-v<version>-windows-x64.exe`
 
 ## Local packaging outline
 
@@ -14,6 +14,6 @@ This project uses Inno Setup to create an installable Windows `.exe`, following 
 flutter build windows --release
 ```
 
-2. Compile the installer with Inno Setup using `packaging/windows/resolve_file_converter.iss`
+2. Compile the installer with Inno Setup using `packaging/windows/resolve_media_converter.iss`
 
 The GitHub Actions workflow automates these steps for tagged releases.

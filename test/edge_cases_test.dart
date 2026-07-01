@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:resolve_file_converter/features/conversion/application/conversion_setup_controller.dart';
-import 'package:resolve_file_converter/models/conversion_enums.dart';
-import 'package:resolve_file_converter/models/tool_paths_settings.dart';
-import 'package:resolve_file_converter/services/output_path_service.dart';
-import 'package:resolve_file_converter/services/trim_parser_service.dart';
+import 'package:resolve_media_converter/features/conversion/application/conversion_setup_controller.dart';
+import 'package:resolve_media_converter/models/conversion_enums.dart';
+import 'package:resolve_media_converter/models/tool_paths_settings.dart';
+import 'package:resolve_media_converter/services/output_path_service.dart';
+import 'package:resolve_media_converter/services/trim_parser_service.dart';
 
 void main() {
   group('TrimParserService', () {

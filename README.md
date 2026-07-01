@@ -1,4 +1,4 @@
-# resolve_file_converter
+# resolve_media_converter
 
 Flutter desktop app for converting `ffmpeg`-readable audio and video files into formats that are easier to edit in DaVinci Resolve.
 

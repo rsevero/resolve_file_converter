@@ -8,7 +8,7 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ### Changed
 
-- Renamed the app's user-facing product name from `Resolve File Converter` to `Resolve Media Converter` across desktop packaging metadata, installer text, and release artifact names while keeping internal bundle IDs and executable names unchanged.
+- Renamed the app from `Resolve File Converter` to `Resolve Media Converter` across user-facing copy and internal package metadata, bundle IDs, executable names, asset filenames, installer scripts, and release artifact references.
 - Switched the GitHub Actions Linux release workflow to run on `ubuntu-22.04` and aligned the AppImage package sources with Ubuntu Jammy.
 - Renamed the macOS release artifact from `*-macos-universal.dmg` to `*-macos.dmg` so the published filename matches the actual build output.
 
@@ -16,7 +16,7 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 - Replaced the Linux release workflow's cached apt-package action with a direct `apt-get` install step so GitHub Actions dependency setup is less likely to stall before the AppImage build begins.
 - Corrected the Linux AppImage `AppDir` layout so the packaged launcher starts the bundled Flutter executable with its adjacent `lib/` and `data/` directories in the expected location.
-- Updated the Linux AppImage recipe entrypoint metadata so `appimage-builder` resolves the packaged executable from `usr/bin/resolve_file_converter` instead of the old AppDir root path.
+- Updated the Linux AppImage recipe entrypoint metadata so `appimage-builder` resolves the packaged executable from `usr/bin/resolve_media_converter` instead of the old AppDir root path.
 - Trimmed unnecessary `librsvg2` packages from the Linux AppImage recipe because the bundled app assets use PNG icons and do not require SVG runtime support.
 - Added a Linux release workflow validation step that checks the generated `.AppImage` with `--appimage-version` before uploading it, preventing broken artifacts from being published.
 - Made the Codemagic macOS release upload step tolerate GitHub release creation races so tagged Linux, Windows, and macOS builds can all publish to the same release reliably.
@@ -80,7 +80,7 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - macOS release automation now builds a DMG package in Codemagic similar to the Mapiah flow.
 - Linux release workflow now also builds an AppImage package similar to the Mapiah release flow.
 - Windows release workflow now builds an installable `.exe` package similar to the Mapiah release flow.
-- Wired the shared `resolve_file_converter-icon.png` asset into Windows, macOS, and Linux packaging icons.
+- Wired the shared `resolve_media_converter-icon.png` asset into Windows, macOS, and Linux packaging icons.
 
 ### Fixed
 

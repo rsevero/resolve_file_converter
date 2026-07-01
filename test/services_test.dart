@@ -1,19 +1,19 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:resolve_file_converter/features/conversion/application/conversion_run_controller.dart';
-import 'package:resolve_file_converter/models/conversion_enums.dart';
-import 'package:resolve_file_converter/models/conversion_request.dart';
-import 'package:resolve_file_converter/models/conversion_result.dart';
-import 'package:resolve_file_converter/models/media_probe_result.dart';
-import 'package:resolve_file_converter/models/resolved_job.dart';
-import 'package:resolve_file_converter/models/source_resolution_result.dart';
-import 'package:resolve_file_converter/services/conversion_log_service.dart';
-import 'package:resolve_file_converter/services/conversion_execution_service.dart';
-import 'package:resolve_file_converter/services/ffmpeg_command_service.dart';
-import 'package:resolve_file_converter/services/media_probe_service.dart';
-import 'package:resolve_file_converter/services/output_path_service.dart';
-import 'package:resolve_file_converter/services/source_resolution_service.dart';
+import 'package:resolve_media_converter/features/conversion/application/conversion_run_controller.dart';
+import 'package:resolve_media_converter/models/conversion_enums.dart';
+import 'package:resolve_media_converter/models/conversion_request.dart';
+import 'package:resolve_media_converter/models/conversion_result.dart';
+import 'package:resolve_media_converter/models/media_probe_result.dart';
+import 'package:resolve_media_converter/models/resolved_job.dart';
+import 'package:resolve_media_converter/models/source_resolution_result.dart';
+import 'package:resolve_media_converter/services/conversion_log_service.dart';
+import 'package:resolve_media_converter/services/conversion_execution_service.dart';
+import 'package:resolve_media_converter/services/ffmpeg_command_service.dart';
+import 'package:resolve_media_converter/services/media_probe_service.dart';
+import 'package:resolve_media_converter/services/output_path_service.dart';
+import 'package:resolve_media_converter/services/source_resolution_service.dart';
 
 void main() {
   group('SourceResolutionService', () {

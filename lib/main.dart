@@ -28,7 +28,7 @@ Future<void> main() async {
       'flutter_assets',
       'assets',
       'icons',
-      'resolve_file_converter-256.png',
+      'resolve_media_converter-256.png',
     );
     if (File(iconPath).existsSync()) {
       unawaited(windowManager.setIcon(iconPath));

@@ -5,7 +5,7 @@ Name=Resolve Media Converter
 Comment=Convert media files into Resolve-friendly formats
 Categories=AudioVideo;Utility;
 
-Icon=resolve_file_converter
+Icon=resolve_media_converter
 Exec=AppRun
 Terminal=false
 StartupWMClass=Resolve Media Converter

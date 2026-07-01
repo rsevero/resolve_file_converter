@@ -84,14 +84,14 @@ class ConversionLogService {
           environment['LOCALAPPDATA'] ??
           environment['USERPROFILE'];
       if (basePath == null || basePath.trim().isEmpty) {
-        return path.join(Directory.systemTemp.path, 'resolve_file_converter');
+        return path.join(Directory.systemTemp.path, 'resolve_media_converter');
       }
-      return path.join(basePath, 'ResolveFileConverter');
+      return path.join(basePath, 'ResolveMediaConverter');
     }
 
     final home = environment['HOME'];
     if (home == null || home.trim().isEmpty) {
-      return path.join(Directory.systemTemp.path, 'resolve_file_converter');
+      return path.join(Directory.systemTemp.path, 'resolve_media_converter');
     }
 
     if (Platform.isMacOS) {
@@ -99,16 +99,16 @@ class ConversionLogService {
         home,
         'Library',
         'Application Support',
-        'ResolveFileConverter',
+        'ResolveMediaConverter',
       );
     }
 
     final stateHome = environment['XDG_STATE_HOME'];
     if (stateHome != null && stateHome.trim().isNotEmpty) {
-      return path.join(stateHome, 'resolve_file_converter');
+      return path.join(stateHome, 'resolve_media_converter');
     }
 
-    return path.join(home, '.local', 'state', 'resolve_file_converter');
+    return path.join(home, '.local', 'state', 'resolve_media_converter');
   }
 
   String _buildContent({
