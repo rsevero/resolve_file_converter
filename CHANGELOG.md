@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
-## v1.0.2 - not yet released
+## v1.0.2 - released on 2026-07-01
 
 ### Changed
 
@@ -27,7 +27,7 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - Fixed DMG verification on Codemagic by parsing mounted volume paths with spaces correctly and by falling back to the first app bundle found in the mounted image.
 - Switched the Codemagic GitHub release publishing step to non-interactive token-based `gh` usage so CI does not fall back to browser/device login prompts.
 
-## v1.0.1 - release 2026-06-29
+## v1.0.1 - released on 2026-06-29
 
 ### Changed
 
@@ -41,7 +41,7 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - Pass `-ss` (start time) both before and after `-i` on ffmpeg so seeking is fast, frame-accurate, and `-to` is treated as an end timestamp rather than a duration.
 - Reset the trim start and end fields after each conversion run so the next conversion starts from a full-range state.
 
-## v1.0.0 - release 2026-06-27
+## v1.0.0 - released on 2026-06-27
 
 ### Added
 
